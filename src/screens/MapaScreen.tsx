@@ -28,7 +28,7 @@ export default function MapaScreen() {
       const u = ubicarMuestra(b, m.avanceM, cotas.get(m.galeriaId)!);
       return {
         lat: u.lat, lon: u.lon, etiqueta: m.codigo, color: m.leyGt == null ? '#ffffff' : colorLey(m.leyGt),
-        detalle: `${nombres.get(m.galeriaId)} · ${m.avanceM} m<br>Ley ${m.leyGt ?? 'pendiente'} g/t · ancho ${m.anchoM} m<br>Cota aprox. ${u.cota.toFixed(1)}<br>UTM E ${u.este.toFixed(0)} N ${u.norte.toFixed(0)}`,
+        detalle: `${nombres.get(m.galeriaId)} · ${m.avanceM} m\nLey ${m.leyGt ?? 'pendiente'} g/t · ancho ${m.anchoM} m\nCota aprox. ${u.cota.toFixed(1)}\nUTM E ${u.este.toFixed(0)} N ${u.norte.toFixed(0)}`,
       };
     });
     return mapaHtml({
@@ -43,7 +43,7 @@ export default function MapaScreen() {
   return (
     <View style={{ flex: 1 }}>
       <WebView originWhitelist={['*']} source={{ html, baseUrl: FileSystem.documentDirectory ?? undefined }}
-        allowFileAccess allowFileAccessFromFileURLs allowUniversalAccessFromFileURLs style={{ flex: 1 }} />
+        allowFileAccess allowFileAccessFromFileURLs style={{ flex: 1 }} />
       <View style={{ padding: 8, backgroundColor: '#fff', borderTopWidth: 2 }}>
         <Texto suave>{ADVERTENCIA_GPS} Las muestras se ubican con rumbo y metros de avance (galería recta).</Texto>
         {!conTeselas ? <Aviso texto="Sin mapa base descargado: se ven solo los puntos. Descárgalo cuando tengas señal." /> : null}

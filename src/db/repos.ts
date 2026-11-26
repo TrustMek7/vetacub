@@ -58,9 +58,11 @@ export const galeriasDe = (db: DB, op: string) => listar<Galeria>(db, 'galeria',
 export const muestrasDe = (db: DB, op: string) => listar<Muestra>(db, 'muestra', 'operacion_id = ?', [op], 'galeria_id, avance_m');
 
 export async function parametrosDe(db: DB, op: string): Promise<{ id: string | null; valores: Parametros }> {
-  const r = (await listar<{ id: string; valores: Partial<Parametros> }>(db, 'parametros', 'operacion_id = ?', [op]))[0];
+  const r = (await listar<{ id: string; valores: Partial<Parametros> & { anchoVolumen?: string } }>(db, 'parametros', 'operacion_id = ?', [op]))[0];
   // Mezcla con los valores por defecto para tolerar parámetros nuevos en versiones futuras.
-  return { id: r?.id ?? null, valores: { ...PARAMETROS_POR_DEFECTO, ...(r?.valores ?? {}) } };
+  const valores = { ...PARAMETROS_POR_DEFECTO, ...r?.valores };
+  delete valores.anchoVolumen;
+  return { id: r?.id ?? null, valores };
 }
 
 export async function guardarParametros(db: DB, op: string, valores: Parametros) {

@@ -24,5 +24,14 @@ test('la operación demo permite incorporar un ensaye y demostrar el factor de p
   assert.equal(conFactor.factor.aplicado, true);
   assert.notEqual(conFactor.resumen.total.gramos, conEnsaye.resumen.total.gramos);
   assert.ok(reporteHtml({ ...demo, muestras, operacion: demo.operacion.nombre, est: conFactor }).includes(ADVERTENCIA_LEGAL));
-  assert.ok(csvResumen(conFactor, demo.params).includes(ADVERTENCIA_LEGAL));
+  const csv = csvResumen(conFactor, demo.params);
+  assert.ok(csv.includes(ADVERTENCIA_LEGAL));
+  const total = csv.split('\r\n').find((fila) => fila.startsWith('total,'));
+  assert.ok(total);
+  const valores = total.split(',').slice(1).map(Number);
+  const resumen = conFactor.resumen.total;
+  assert.deepEqual(valores, [
+    resumen.bloques, resumen.toneladas, resumen.leyMedia, resumen.gramos,
+    resumen.onzas, resumen.gramosRecuperables, resumen.onzasRecuperables,
+  ].map((valor) => Math.round(valor * 10000) / 10000));
 });
