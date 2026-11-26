@@ -30,8 +30,12 @@ export default function MuestraFormScreen() {
   };
   const sugerirCodigo = (gid: string) => {
     const g = app.galerias.find((x) => x.id === gid);
-    const n = deGaleria(gid).length + 1;
-    return `${(g?.nombre ?? 'M').replace(/\s+/g, '')}-${String(n).padStart(3, '0')}`;
+    const prefijo = (g?.nombre ?? 'M').replace(/\s+/g, '');
+    const ocupados = new Set(app.muestras.map((x) => x.codigo.trim().toLowerCase()));
+    let n = deGaleria(gid).length + 1;
+    const codigo = () => `${prefijo}-${String(n).padStart(3, '0')}`;
+    while (ocupados.has(codigo().toLowerCase())) n++;
+    return codigo();
   };
 
   const [avance, setAvance] = useState(m ? String(m.avanceM) : sugerirAvance(galeriaId));
@@ -47,6 +51,8 @@ export default function MuestraFormScreen() {
   const [errores, setErrores] = useState<Record<string, string | undefined>>({});
   const refAncho = useRef<React.ComponentRef<typeof TextInput>>(null);
   const refLey = useRef<React.ComponentRef<typeof TextInput>>(null);
+  const guardando = useRef(false);
+  const [ocupado, setOcupado] = useState(false);
 
   const cambiarGaleria = (gid: string) => {
     setGaleriaId(gid);
@@ -75,26 +81,40 @@ export default function MuestraFormScreen() {
     setErrores(validacion.errores);
     if (!validacion.ok || !app.db || !app.operacionId) return;
     const hacer = async () => {
+      if (guardando.current) return;
+      if (!codigo.trim()) {
+        Alert.alert('Código requerido', 'Ingresa un código para identificar la muestra.');
+        return;
+      }
       if (app.muestras.some((x) => x.id !== m?.id && x.codigo.trim().toLowerCase() === codigo.trim().toLowerCase())) {
         Alert.alert('Código repetido', 'Ya existe una muestra con ese código.'); return;
       }
-      await guardar<Muestra>(app.db!, 'muestra', {
-        id: m?.id, operacionId: app.operacionId!, galeriaId, codigo: codigo.trim(), avanceM: num(avance)!, anchoM: num(ancho)!,
-        leyGt: num(ley), origenLey: origen, fotoUri: foto, loteVentaCodigo: lote.trim() || null, fecha, observaciones: obs.trim() || null,
-      });
-      await setMeta(app.db!, 'ultimaGaleria', galeriaId);
-      await app.recargar();
-      if (siguiente) {
-        // Limpia para la siguiente muestra de la misma galería
-        // Mismo paso que entre esta muestra y la anterior (2–5 m típico); 3 m si no hay referencia.
-        const actual = num(avance)!;
-        const anterior = deGaleria(galeriaId).filter((x) => x.avanceM < actual).at(-1)?.avanceM;
-        const paso = anterior != null && actual - anterior >= 1 && actual - anterior <= 5 ? actual - anterior : 3;
-        setAvance(String(Math.round((actual + paso) * 10) / 10)); setAncho(''); setLey(''); setFoto(null); setObs(''); setLote('');
-        setCodigo((c) => c.replace(/(\d+)$/, (d) => String(Number(d) + 1).padStart(d.length, '0')));
-        setErrores({});
-        refAncho.current?.focus();
-      } else nav.goBack();
+      guardando.current = true;
+      setOcupado(true);
+      try {
+        await guardar<Muestra>(app.db!, 'muestra', {
+          id: m?.id, operacionId: app.operacionId!, galeriaId, codigo: codigo.trim(), avanceM: num(avance)!, anchoM: num(ancho)!,
+          leyGt: num(ley), origenLey: origen, fotoUri: foto, loteVentaCodigo: lote.trim() || null, fecha, observaciones: obs.trim() || null,
+        });
+        await setMeta(app.db!, 'ultimaGaleria', galeriaId);
+        await app.recargar();
+        if (siguiente) {
+          // Limpia para la siguiente muestra de la misma galería
+          // Mismo paso que entre esta muestra y la anterior (2–5 m típico); 3 m si no hay referencia.
+          const actual = num(avance)!;
+          const anterior = deGaleria(galeriaId).filter((x) => x.avanceM < actual).at(-1)?.avanceM;
+          const paso = anterior != null && actual - anterior >= 1 && actual - anterior <= 5 ? actual - anterior : 3;
+          setAvance(String(Math.round((actual + paso) * 10) / 10)); setAncho(''); setLey(''); setFoto(null); setObs(''); setLote('');
+          setCodigo((c) => c.replace(/(\d+)$/, (d) => String(Number(d) + 1).padStart(d.length, '0')));
+          setErrores({});
+          refAncho.current?.focus();
+        } else nav.goBack();
+      } catch (error) {
+        Alert.alert('No se pudo guardar la muestra', error instanceof Error ? error.message : String(error));
+      } finally {
+        guardando.current = false;
+        setOcupado(false);
+      }
     };
     if (validacion.advertencias.length) {
       Alert.alert('Revisa', validacion.advertencias.join('\n\n'), [{ text: 'Corregir', style: 'cancel' }, { text: 'Guardar igual', onPress: hacer }]);
@@ -104,8 +124,8 @@ export default function MuestraFormScreen() {
   return (
     <Pantalla pie={
       <View style={{ flexDirection: 'row', gap: 8 }}>
-        <Boton estilo={{ flex: 1 }} variante="secundario" titulo="Guardar" onPress={() => guardarM(false)} />
-        {!m ? <Boton estilo={{ flex: 1.4 }} variante="acento" titulo="Guardar y siguiente" onPress={() => guardarM(true)} /> : null}
+        <Boton estilo={{ flex: 1 }} variante="secundario" titulo="Guardar" deshabilitado={ocupado} onPress={() => guardarM(false)} />
+        {!m ? <Boton estilo={{ flex: 1.4 }} variante="acento" titulo="Guardar y siguiente" deshabilitado={ocupado} onPress={() => guardarM(true)} /> : null}
       </View>}>
       <Selector etiqueta="Galería" valor={galeriaId} onCambio={cambiarGaleria} opciones={app.galerias.map((g) => ({ k: g.id, t: g.nombre }))} />
       <Campo etiqueta="Metros desde bocamina (wincha)" valor={avance} onCambio={setAvance} numerico sufijo="m" error={errores.avanceM}

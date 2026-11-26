@@ -38,9 +38,13 @@ export default function InicioScreen() {
   const pendientes = app.muestras.filter((m) => m.syncStatus !== 'sincronizado').length + app.galerias.filter((g) => g.syncStatus !== 'sincronizado').length;
 
   return (
-    <Pantalla pie={<Boton variante="acento" titulo="＋ Registrar muestra" onPress={() => nav.navigate('MuestraForm')} />}>
+    <Pantalla pie={app.bocamina && app.galerias.length > 0
+      ? <Boton variante="acento" titulo="Registrar muestra" onPress={() => nav.navigate('MuestraForm')} />
+      : undefined}>
       <Text style={{ fontSize: T.xl, fontWeight: '900' }}>{op?.nombre}</Text>
-      <Texto suave>{app.galerias.length} galerías · {app.muestras.length} muestras · {pendientes > 0 ? `${pendientes} por sincronizar` : 'todo sincronizado'}</Texto>
+      <Texto suave>{app.galerias.length} galerías · {app.muestras.length} muestras · {app.operacionDemo
+        ? 'Demo guardada en este equipo'
+        : pendientes > 0 ? `${pendientes} por sincronizar` : 'todo sincronizado'}</Texto>
 
       {!app.bocamina ? <><Aviso tipo="peligro" texto="Falta configurar la bocamina (GPS, cota y rumbo)." /><Boton titulo="Configurar bocamina" onPress={() => nav.navigate('Bocamina')} /></> : null}
       {app.bocamina && app.galerias.length === 0 ? <><Aviso texto="Registra al menos una galería o nivel." /><Boton titulo="Agregar galería" onPress={() => nav.navigate('GaleriaForm')} /></> : null}
