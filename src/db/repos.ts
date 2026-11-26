@@ -1,4 +1,5 @@
 // Acceso a datos local. Cada escritura: nuevo updatedAt, version+1 y syncStatus 'pendiente'.
+import { datosDemo } from '../demo/datosDemo';
 import * as Crypto from 'expo-crypto';
 import type { DB } from './database';
 import { aEntidad, aFila } from './schema';
@@ -92,17 +93,59 @@ export async function conteoSync(db: DB): Promise<Record<string, Record<string, 
   return out;
 }
 
-/** Inserta un conjunto de datos completo (ejemplo) como registros pendientes. */
-export async function importarDatos(db: DB, d: { operacion: { id: string; nombre: string }; bocamina: Bocamina; galerias: Galeria[]; muestras: Muestra[]; liquidaciones: Liquidacion[]; params: Parametros }) {
-  await db.withTransactionAsync(async () => {
+/** Abre o restablece la operación local de demostración. */
+export async function cargarDemo(db: DB, restablecer = false): Promise<string> {
+  let demoId = '';
+  await db.withExclusiveTransactionAsync(async (db) => {
+    const anterior = await getMeta(db, 'operacionDemo');
+    if (anterior && !restablecer) {
+      demoId = anterior;
+      return;
+    }
+    demoId = anterior ?? nuevoId();
+    if (anterior) {
+      for (const tabla of ['muestra', 'galeria', 'bocamina', 'parametros', 'liquidacion']) {
+        await db.runAsync(`DELETE FROM ${tabla} WHERE operacion_id = ?`, [demoId]);
+      }
+    }
+
+    const d = datosDemo(demoId);
+    const ids = new Map(d.galerias.map((g) => [g.id, nuevoId()]));
+    d.bocamina.id = nuevoId();
+    for (const g of d.galerias) {
+      g.id = ids.get(g.id)!;
+      if (g.galeriaRefId) g.galeriaRefId = ids.get(g.galeriaRefId)!;
+    }
+    for (const m of d.muestras) {
+      m.id = nuevoId();
+      m.galeriaId = ids.get(m.galeriaId)!;
+    }
+    await setMeta(db, 'operacionDemo', demoId);
     await guardar<Operacion>(db, 'operacion', { id: d.operacion.id, nombre: d.operacion.nombre });
     await guardar<Bocamina>(db, 'bocamina', d.bocamina);
     for (const g of d.galerias) await guardar<Galeria>(db, 'galeria', g);
     for (const m of d.muestras) await guardar<Muestra>(db, 'muestra', m);
     await guardarParametros(db, d.operacion.id, d.params);
-    for (const l of d.liquidaciones) {
-      await db.runAsync(`INSERT OR REPLACE INTO liquidacion (id, operacion_id, lote_codigo, fecha, toneladas, ley_gt, codigos_muestra, server_version, updated_at, deleted)
-        VALUES (?,?,?,?,?,?,?,0,?,0)`, [l.id, l.operacionId, l.loteCodigo, l.fecha, l.toneladas, l.leyGt, JSON.stringify(l.codigosMuestra ?? []), ahora()]);
+    for (const l of d.liquidaciones.slice(0, 2)) {
+      await guardarLiquidacionDemo(db, l);
+    }
+  });
+  return demoId;
+}
+
+
+async function guardarLiquidacionDemo(db: DB, l: Liquidacion) {
+  await db.runAsync(`INSERT INTO liquidacion (id, operacion_id, lote_codigo, fecha, toneladas, ley_gt, codigos_muestra, server_version, updated_at, deleted)
+    VALUES (?,?,?,?,?,?,?,0,?,0)`, [nuevoId(), l.operacionId, l.loteCodigo, l.fecha, l.toneladas, l.leyGt, JSON.stringify(l.codigosMuestra ?? []), ahora()]);
+}
+
+export async function agregarLiquidacionDemo(db: DB, operacionId: string) {
+  await db.withExclusiveTransactionAsync(async (db) => {
+    if (await getMeta(db, 'operacionDemo') !== operacionId) return;
+    const liquidacion = datosDemo(operacionId).liquidaciones[2];
+    const actuales = await liquidacionesDe(db, operacionId);
+    if (!actuales.some((l) => l.loteCodigo === liquidacion.loteCodigo)) {
+      await guardarLiquidacionDemo(db, liquidacion);
     }
   });
 }

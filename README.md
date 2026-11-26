@@ -41,7 +41,7 @@ El reporte de ejemplo y sus CSV quedan en `demo/`.
 
 ## Uso en campo
 
-1. **Inicio** → crear operación (o *Más → Operaciones → Cargar ejemplo*).
+1. **Inicio** → crear operación (o *Más → Operaciones → Abrir operación demo*).
 2. **Bocamina** (en la entrada, fuera del socavón): *Tomar GPS*, cota (mejor de carta IGN), rumbo con número o brújula del celular.
 3. **Galerías**: nombre y desnivel con wincha, desde la bocamina o desde otra galería. La cota se calcula sola.
 4. **Muestras** cada 2–5 m: *＋ Registrar muestra* → metros (sugeridos), ancho, ley (puede quedar vacía hasta el ensaye), origen. *Guardar y siguiente* deja lista la siguiente muestra de la misma galería. Objetivo: menos de 1 minuto.
@@ -49,6 +49,8 @@ El reporte de ejemplo y sus CSV quedan en `demo/`.
 6. **Resultados**: por categoría, factor de planta (activar/desactivar y ver impacto), exportar PDF y CSV.
 7. **Parámetros**: densidad, ancho mínimo, ley de corte, recuperación, celda, IDW, umbrales, precio y costos del semáforo.
 8. **Sincronización**: automática al detectar señal; los conflictos se confirman a mano.
+
+La operación demo se guarda en el equipo y se excluye de la sincronización. En **Resultados → Factor de planta**, agrega la tercera liquidación de ejemplo para ver la corrección. **Restablecer demo** repone sus muestras y liquidaciones iniciales después de confirmar.
 
 ## Casos de prueba (tests/engine.test.ts, tests/sync.test.ts)
 

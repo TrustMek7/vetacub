@@ -21,7 +21,7 @@ export function almacenSqlite(db: DB): AlmacenSync {
       for (const t of ['operacion', 'parametros', 'bocamina', 'galeria', 'muestra'] as TablaSync[]) {
         if (out.length >= limite) break;
         const filas = await db.getAllAsync<Record<string, unknown>>(
-          `SELECT * FROM ${t} WHERE sync_status IN ('pendiente','error') AND id NOT IN (SELECT id FROM sync_conflicto WHERE tabla = ?) ORDER BY updated_at LIMIT ?`,
+          `SELECT * FROM ${t} WHERE sync_status IN ('pendiente','error') AND ${t === 'operacion' ? 'id' : 'operacion_id'} NOT IN (SELECT valor FROM sync_meta WHERE clave = 'operacionDemo' AND valor IS NOT NULL) AND id NOT IN (SELECT id FROM sync_conflicto WHERE tabla = ?) ORDER BY updated_at LIMIT ?`,
           [t, limite - out.length]);
         out.push(...filas.map((f) => aLocal(t, f)));
       }

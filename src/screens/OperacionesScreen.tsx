@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Alert } from 'react-native';
 import { useApp } from '../state/AppContext';
 import { Boton, Campo, Pantalla, Texto, Titulo } from '../ui/components';
-import { guardar, guardarParametros, importarDatos, nuevoId } from '../db/repos';
-import { datosDemo } from '../demo/datosDemo';
+import { cargarDemo, guardar, guardarParametros } from '../db/repos';
 import { PARAMETROS_POR_DEFECTO } from '../engine/params';
 import type { Operacion } from '../domain/types';
 import { useNav } from './nav';
@@ -12,6 +11,19 @@ export default function OperacionesScreen() {
   const app = useApp();
   const nav = useNav();
   const [nombre, setNombre] = useState('');
+  const guardandoDemo = useRef(false);
+  const abrirDemo = async (restablecer = false) => {
+    if (!app.db || guardandoDemo.current) return;
+    guardandoDemo.current = true;
+    try {
+      await app.elegirOperacion(await cargarDemo(app.db, restablecer));
+      nav.goBack();
+    } catch (error) {
+      Alert.alert('No se pudo cargar el ejemplo', error instanceof Error ? error.message : String(error));
+    } finally {
+      guardandoDemo.current = false;
+    }
+  };
   return (
     <Pantalla>
       <Titulo>Elegir operación</Titulo>
@@ -28,20 +40,13 @@ export default function OperacionesScreen() {
         nav.replace('Bocamina');
       }} />
       <Titulo>Datos de ejemplo</Titulo>
-      <Texto suave>Carga una mina ficticia con 3 niveles, 45 muestras y 3 liquidaciones para conocer la app.</Texto>
-      <Boton variante="acento" titulo="Cargar ejemplo" onPress={async () => {
-        const d = datosDemo(nuevoId());
-        // IDs nuevos para no chocar con otra carga del ejemplo
-        const mapa = new Map<string, string>();
-        const id = (v: string) => { if (!mapa.has(v)) mapa.set(v, nuevoId()); return mapa.get(v)!; };
-        d.bocamina.id = id(d.bocamina.id);
-        d.galerias.forEach((g) => { g.id = id(g.id); if (g.galeriaRefId) g.galeriaRefId = id(g.galeriaRefId); });
-        d.muestras.forEach((m) => { m.id = id(m.id); m.galeriaId = id(m.galeriaId); });
-        d.liquidaciones.forEach((l) => { l.id = id(l.id); l.operacionId = d.operacion.id; });
-        await importarDatos(app.db!, d);
-        await app.elegirOperacion(d.operacion.id);
-        Alert.alert('Listo', 'Se cargó la mina de ejemplo.');
-        nav.goBack();
+      <Texto suave>Explora una operación ficticia con tres galerías y una muestra pendiente de ensaye.</Texto>
+      <Boton variante="acento" titulo="Abrir operación demo" onPress={() => abrirDemo()} />
+      <Boton variante="secundario" titulo="Restablecer demo" onPress={() => {
+        Alert.alert('Restablecer operación demo', 'Se reemplazarán los cambios hechos en la operación de ejemplo.', [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Restablecer', style: 'destructive', onPress: () => void abrirDemo(true) },
+        ]);
       }} />
     </Pantalla>
   );

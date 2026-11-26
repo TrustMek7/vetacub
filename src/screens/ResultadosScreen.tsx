@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Switch, Text, View } from 'react-native';
+import { Alert, Switch, Text, View } from 'react-native';
 import { useApp } from '../state/AppContext';
 import { AdvertenciaLegal, Aviso, Boton, Pantalla, SemaforoCard, Tarjeta, Texto, Titulo, fmt } from '../ui/components';
-import { guardarParametros } from '../db/repos';
+import { agregarLiquidacionDemo, guardarParametros } from '../db/repos';
 import { compartirCsv, compartirPdfReporte } from '../export/share';
 import { COLOR_CATEGORIA, COLOR_BAJO_CORTE } from '../engine/sectionLayout';
 import { ADVERTENCIA_CATEGORIAS } from '../domain/types';
@@ -35,7 +35,7 @@ export default function ResultadosScreen() {
   if (!e) return <Pantalla><Aviso texto={app.errorCalculo ?? 'Faltan datos para calcular.'} /><AdvertenciaLegal /></Pantalla>;
   const r = e.resumen;
   const f = e.factor;
-  const exportar = async (fn: () => Promise<unknown>) => { setOcupado(true); try { await fn(); } finally { setOcupado(false); } };
+  const ejecutar = async (fn: () => Promise<unknown>) => { setOcupado(true); try { await fn(); } catch (error) { Alert.alert('No se pudo completar la acción', error instanceof Error ? error.message : String(error)); } finally { setOcupado(false); } };
 
   return (
     <Pantalla>
@@ -55,6 +55,12 @@ export default function ResultadosScreen() {
 
       <Tarjeta>
         <Titulo>Factor de planta</Titulo>
+        {app.operacionDemo && app.liquidaciones.length === 2 ? <Boton variante="secundario"
+          titulo="Agregar tercera liquidación de ejemplo" deshabilitado={ocupado}
+          onPress={() => ejecutar(async () => {
+            await agregarLiquidacionDemo(app.db!, app.operacionId!);
+            await app.recargar();
+          })} /> : null}
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Texto negrita>Aplicar factor de planta</Texto>
           <Switch value={app.params.aplicarFactorPlanta} style={{ transform: [{ scale: 1.4 }] }}
@@ -72,11 +78,11 @@ export default function ResultadosScreen() {
       {e.problemasParametros.map((p) => <Aviso key={p.campo} texto={`Parámetro ${p.campo}: ${p.mensaje}`} />)}
 
       <Titulo>Exportar</Titulo>
-      <Boton titulo="📄 Reporte PDF" deshabilitado={ocupado} onPress={() => exportar(() => compartirPdfReporte(app, e))} />
+      <Boton titulo="📄 Reporte PDF" deshabilitado={ocupado} onPress={() => ejecutar(() => compartirPdfReporte(app, e))} />
       <View style={{ flexDirection: 'row', gap: 8 }}>
-        <Boton chico estilo={{ flex: 1 }} variante="secundario" titulo="CSV resumen" deshabilitado={ocupado} onPress={() => exportar(() => compartirCsv(app, e, 'resumen'))} />
-        <Boton chico estilo={{ flex: 1 }} variante="secundario" titulo="CSV bloques" deshabilitado={ocupado} onPress={() => exportar(() => compartirCsv(app, e, 'bloques'))} />
-        <Boton chico estilo={{ flex: 1 }} variante="secundario" titulo="CSV muestras" deshabilitado={ocupado} onPress={() => exportar(() => compartirCsv(app, e, 'muestras'))} />
+        <Boton chico estilo={{ flex: 1 }} variante="secundario" titulo="CSV resumen" deshabilitado={ocupado} onPress={() => ejecutar(() => compartirCsv(app, e, 'resumen'))} />
+        <Boton chico estilo={{ flex: 1 }} variante="secundario" titulo="CSV bloques" deshabilitado={ocupado} onPress={() => ejecutar(() => compartirCsv(app, e, 'bloques'))} />
+        <Boton chico estilo={{ flex: 1 }} variante="secundario" titulo="CSV muestras" deshabilitado={ocupado} onPress={() => ejecutar(() => compartirCsv(app, e, 'muestras'))} />
       </View>
       <AdvertenciaLegal compacta />
     </Pantalla>

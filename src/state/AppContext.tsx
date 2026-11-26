@@ -16,6 +16,7 @@ interface Estado {
   listo: boolean;
   operaciones: Operacion[];
   operacionId: string | null;
+  operacionDemo: boolean;
   bocamina: Bocamina | null;
   galerias: Galeria[];
   muestras: Muestra[];
@@ -44,7 +45,7 @@ export const useApp = () => {
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [s, set] = useState<Estado>({
-    db: null, listo: false, operaciones: [], operacionId: null, bocamina: null, galerias: [], muestras: [], liquidaciones: [],
+    db: null, listo: false, operaciones: [], operacionId: null, operacionDemo: false, bocamina: null, galerias: [], muestras: [], liquidaciones: [],
     params: PARAMETROS_POR_DEFECTO, estimacion: null, errorCalculo: null, sincronizando: false, ultimoSync: null,
   });
   const [syncUrl, setSyncUrlState] = useState<string>((Constants.expoConfig?.extra?.syncUrl as string) ?? '');
@@ -53,11 +54,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const cargar = useCallback(async (db: DB, opId: string | null) => {
     const operaciones = await R.operaciones(db);
     const id = opId && operaciones.some((o) => o.id === opId) ? opId : operaciones[0]?.id ?? null;
-    if (!id) { set((p) => ({ ...p, db, listo: true, operaciones, operacionId: null, bocamina: null, galerias: [], muestras: [], liquidaciones: [], estimacion: null })); return; }
-    const [bocamina, galerias, muestras, liquidaciones, prm] = await Promise.all([
-      R.bocaminaDe(db, id), R.galeriasDe(db, id), R.muestrasDe(db, id), R.liquidacionesDe(db, id), R.parametrosDe(db, id),
+    if (!id) { set((p) => ({ ...p, db, listo: true, operaciones, operacionId: null, operacionDemo: false, bocamina: null, galerias: [], muestras: [], liquidaciones: [], estimacion: null })); return; }
+    const [bocamina, galerias, muestras, liquidaciones, prm, demoId] = await Promise.all([
+      R.bocaminaDe(db, id), R.galeriasDe(db, id), R.muestrasDe(db, id), R.liquidacionesDe(db, id), R.parametrosDe(db, id), R.getMeta(db, 'operacionDemo'),
     ]);
-    set((p) => ({ ...p, db, listo: true, operaciones, operacionId: id, bocamina, galerias, muestras, liquidaciones, params: prm.valores }));
+    set((p) => ({ ...p, db, listo: true, operaciones, operacionId: id, operacionDemo: id === demoId, bocamina, galerias, muestras, liquidaciones, params: prm.valores }));
   }, []);
 
   useEffect(() => {
