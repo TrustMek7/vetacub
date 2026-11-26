@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import Constants from 'expo-constants';
@@ -41,7 +42,7 @@ export default function MapaScreen() {
   if (!app.bocamina || !html) return <Pantalla><Aviso tipo="peligro" texto="Configura la bocamina para ver el mapa." /></Pantalla>;
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
       <WebView originWhitelist={['*']} source={{ html, baseUrl: FileSystem.documentDirectory ?? undefined }}
         allowFileAccess allowFileAccessFromFileURLs style={{ flex: 1 }} />
       <View style={{ padding: 8, backgroundColor: '#fff', borderTopWidth: 2 }}>
@@ -56,6 +57,6 @@ export default function MapaScreen() {
             setConTeselas(r.ok > 0);
           }} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

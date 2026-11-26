@@ -10,7 +10,7 @@ export default function GaleriasScreen() {
   const nav = useNav();
   const cotas = app.estimacion?.modelo.cotas;
   return (
-    <Pantalla pie={<Boton titulo="＋ Nueva galería / nivel" onPress={() => nav.navigate('GaleriaForm')} />}>
+    <Pantalla pie={<Boton icono="agregar" titulo="Nueva galería" onPress={() => nav.navigate('GaleriaForm')} />}>
       {!app.bocamina ? <Aviso tipo="peligro" texto="Configura primero la bocamina: la cota de cada galería se calcula desde ella." /> : null}
       {app.galerias.length === 0 ? <Texto suave>Aún no hay galerías.</Texto> : null}
       {[...app.galerias].sort((a, b) => (cotas?.get(b.id) ?? 0) - (cotas?.get(a.id) ?? 0)).map((g) => {

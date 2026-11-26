@@ -29,7 +29,7 @@ export default function SyncScreen() {
   const configurado = !!app.syncUrl && !app.syncUrl.includes('TU-BACKEND');
 
   return (
-    <Pantalla pie={<Boton titulo={app.sincronizando ? 'Sincronizando…' : '⇅ Sincronizar ahora'} deshabilitado={app.sincronizando || !configurado}
+    <Pantalla pie={<Boton icono="sincronizar" titulo={app.sincronizando ? 'Sincronizando…' : 'Sincronizar ahora'} deshabilitado={app.sincronizando || !configurado}
       onPress={async () => { await app.sincronizarAhora(); await refrescar(); }} />}>
       <Tarjeta>
         <Fila izq="Pendientes" der={String(tot('pendiente'))} negrita />

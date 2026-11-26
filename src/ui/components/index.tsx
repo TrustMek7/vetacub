@@ -1,13 +1,16 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, type ViewStyle } from 'react-native';
+import { BottomTabBarHeightContext } from '@react-navigation/bottom-tabs';
+import { Icono, type NombreIcono } from '../Icono';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ADVERTENCIA_LEGAL } from '../../domain/types';
 import { ALTO_BOTON, C, ESPACIO, T } from '../theme';
 import type { Semaforo } from '../../engine';
 
 export function Pantalla({ children, scroll = true, pie }: { children: React.ReactNode; scroll?: boolean; pie?: React.ReactNode }) {
+  const enPestaña = React.useContext(BottomTabBarHeightContext) != null;
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.fondo }} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.fondo }} edges={enPestaña ? ['left', 'right'] : ['left', 'right', 'bottom']}>
       {scroll ? <ScrollView contentContainerStyle={{ padding: ESPACIO, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">{children}</ScrollView>
         : <View style={{ flex: 1, padding: ESPACIO }}>{children}</View>}
       {pie ? <View style={st.pie}>{pie}</View> : null}
@@ -16,15 +19,16 @@ export function Pantalla({ children, scroll = true, pie }: { children: React.Rea
 }
 
 type Variante = 'primario' | 'secundario' | 'peligro' | 'acento';
-export function Boton({ titulo, onPress, variante = 'primario', deshabilitado, estilo, chico }: {
-  titulo: string; onPress: () => void; variante?: Variante; deshabilitado?: boolean; estilo?: ViewStyle; chico?: boolean;
+export function Boton({ titulo, onPress, variante = 'primario', deshabilitado, estilo, chico, icono, soloIcono }: {
+  titulo: string; onPress: () => void; variante?: Variante; deshabilitado?: boolean; estilo?: ViewStyle; chico?: boolean; icono?: NombreIcono; soloIcono?: boolean;
 }) {
-  const fondo = { primario: C.primario, secundario: C.fondo, peligro: C.peligro, acento: C.acento }[variante];
+  const fondo = { primario: C.primario, secundario: C.superficie, peligro: C.peligro, acento: C.acento }[variante];
   const color = variante === 'secundario' || variante === 'acento' ? C.texto : C.primarioTexto;
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} disabled={deshabilitado}
+    <Pressable accessibilityRole="button" accessibilityLabel={titulo} onPress={onPress} disabled={deshabilitado}
       style={({ pressed }) => [st.boton, { backgroundColor: fondo, opacity: deshabilitado ? 0.4 : pressed ? 0.75 : 1, minHeight: chico ? 48 : ALTO_BOTON }, estilo]}>
-      <Text style={[st.botonTexto, { color, fontSize: chico ? T.s : T.m }]}>{titulo}</Text>
+      {icono ? <Icono nombre={icono} color={color} tam={20} /> : null}
+      {!soloIcono ? <Text style={[st.botonTexto, { color, fontSize: chico ? T.s : T.m }]}>{titulo}</Text> : null}
     </Pressable>
   );
 }
@@ -43,7 +47,7 @@ export function Campo({ etiqueta, valor, onCambio, numerico, error, ayuda, place
           returnKeyType={onSubmit ? 'next' : 'done'} onSubmitEditing={onSubmit} blurOnSubmit={!onSubmit} selectTextOnFocus />
         {sufijo ? <Text style={st.sufijo}>{sufijo}</Text> : null}
       </View>
-      {error ? <Text style={st.error}>⚠ {error}</Text> : ayuda ? <Text style={st.ayuda}>{ayuda}</Text> : null}
+      {error ? <Text style={st.error}>{error}</Text> : ayuda ? <Text style={st.ayuda}>{ayuda}</Text> : null}
     </View>
   );
 }
@@ -82,7 +86,7 @@ export function Texto({ children, suave, negrita, tam = T.s }: { children: React
 export function AdvertenciaLegal({ compacta }: { compacta?: boolean }) {
   return (
     <View style={st.advertencia} accessibilityRole="alert">
-      <Text style={{ fontSize: compacta ? T.xs : T.s, fontWeight: '700', color: C.texto }}>⚠ {ADVERTENCIA_LEGAL}</Text>
+      <Text style={{ fontSize: compacta ? T.xs : T.s, fontWeight: '700', color: C.texto }}>{ADVERTENCIA_LEGAL}</Text>
     </View>
   );
 }
@@ -99,8 +103,10 @@ export function SemaforoCard({ s, moneda }: { s: Semaforo; moneda: string }) {
   return (
     <View style={[st.semaforo, { borderColor: COLOR_SEM[s.estado] }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: COLOR_SEM[s.estado], borderWidth: 2, borderColor: C.borde }} />
-        <Text style={{ flex: 1, fontSize: T.l, fontWeight: '900', color: C.texto }}>{s.titulo}</Text>
+        <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: C.superficie, alignItems: 'center', justifyContent: 'center' }}>
+          <Icono nombre={s.estado === 'seguir' ? 'confirmar' : s.estado === 'sin_datos' ? 'informacion' : 'aviso'} color={COLOR_SEM[s.estado]} />
+        </View>
+        <Text style={{ flex: 1, fontSize: T.l, fontWeight: '800', color: C.texto }}>{s.titulo}</Text>
       </View>
       <Text style={{ fontSize: T.s, marginTop: 8, color: C.texto }}>{s.detalle}</Text>
       <Text style={{ fontSize: T.m, marginTop: 6, fontWeight: '700' }}>{fmt(s.onzasRecuperablesPP, 1)} oz recuperables (Probado + Probable)</Text>
@@ -120,20 +126,20 @@ export function Fila({ izq, der, negrita }: { izq: string; der: string; negrita?
 }
 
 export const st = StyleSheet.create({
-  boton: { borderRadius: 10, borderWidth: 2, borderColor: C.borde, paddingHorizontal: 16, alignItems: 'center', justifyContent: 'center', marginVertical: 6 },
-  botonTexto: { fontWeight: '800', textAlign: 'center' },
+  boton: { flexDirection: 'row', gap: 8, borderRadius: 12, borderWidth: 1, borderColor: C.borde, paddingHorizontal: 16, alignItems: 'center', justifyContent: 'center', marginVertical: 6 },
+  botonTexto: { flexShrink: 1, fontWeight: '800', textAlign: 'center' },
   etiqueta: { fontSize: T.s, fontWeight: '700', color: C.texto, marginBottom: 4 },
-  inputCaja: { flexDirection: 'row', alignItems: 'center', borderWidth: 2, borderColor: C.borde, borderRadius: 8, backgroundColor: C.fondo },
+  inputCaja: { flexDirection: 'row', alignItems: 'center', borderWidth: 2, borderColor: C.borde, borderRadius: 10, backgroundColor: C.superficie },
   input: { flex: 1, fontSize: T.l, paddingHorizontal: 12, minHeight: 56, color: C.texto },
   sufijo: { fontSize: T.m, fontWeight: '700', paddingHorizontal: 12, color: C.textoSuave },
   error: { color: C.peligro, fontSize: T.s, fontWeight: '700', marginTop: 4 },
   ayuda: { color: C.textoSuave, fontSize: T.xs, marginTop: 4 },
   opcion: { borderWidth: 2, borderColor: C.borde, borderRadius: 8, paddingHorizontal: 14, minHeight: 52, justifyContent: 'center' },
-  tarjeta: { borderWidth: 2, borderColor: C.borde, borderRadius: 10, padding: ESPACIO, marginVertical: 6, backgroundColor: C.fondo },
+  tarjeta: { borderWidth: 1, borderColor: C.borde, borderRadius: 16, padding: ESPACIO, marginVertical: 6, backgroundColor: C.superficie },
   advertencia: { borderWidth: 3, borderColor: C.peligro, backgroundColor: '#FFF4F4', padding: 10, borderRadius: 8, marginVertical: 8 },
   aviso: { borderLeftWidth: 8, backgroundColor: C.fondoSuave, padding: 10, borderRadius: 6, marginVertical: 4 },
-  semaforo: { borderWidth: 4, borderRadius: 12, padding: ESPACIO, marginVertical: 8, backgroundColor: C.fondo },
-  pie: { padding: ESPACIO, borderTopWidth: 2, borderTopColor: C.borde, backgroundColor: C.fondo },
+  semaforo: { borderWidth: 1, borderRadius: 16, padding: ESPACIO, marginVertical: 8, backgroundColor: C.fondoSuave },
+  pie: { paddingHorizontal: ESPACIO, paddingVertical: 4, borderTopWidth: 1, borderTopColor: C.borde, backgroundColor: C.superficie },
 });
 
 export const num = (t: string): number | null => {

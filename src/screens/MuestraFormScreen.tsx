@@ -125,7 +125,7 @@ export default function MuestraFormScreen() {
     <Pantalla pie={
       <View style={{ flexDirection: 'row', gap: 8 }}>
         <Boton estilo={{ flex: 1 }} variante="secundario" titulo="Guardar" deshabilitado={ocupado} onPress={() => guardarM(false)} />
-        {!m ? <Boton estilo={{ flex: 1.4 }} variante="acento" titulo="Guardar y siguiente" deshabilitado={ocupado} onPress={() => guardarM(true)} /> : null}
+        {!m ? <Boton estilo={{ flex: 1.4 }} variante="acento" titulo="Guardar y seguir" deshabilitado={ocupado} onPress={() => guardarM(true)} /> : null}
       </View>}>
       <Selector etiqueta="Galería" valor={galeriaId} onCambio={cambiarGaleria} opciones={app.galerias.map((g) => ({ k: g.id, t: g.nombre }))} />
       <Campo etiqueta="Metros desde bocamina (wincha)" valor={avance} onCambio={setAvance} numerico sufijo="m" error={errores.avanceM}
@@ -141,7 +141,7 @@ export default function MuestraFormScreen() {
 
       {!mas ? <Boton chico variante="secundario" titulo="Más datos (foto, lote, notas)" onPress={() => setMas(true)} /> : (
         <>
-          <Boton chico variante="secundario" titulo={foto ? '📷 Cambiar foto' : '📷 Tomar foto'} onPress={tomarFoto} />
+          <Boton chico variante="secundario" icono="camara" titulo={foto ? 'Cambiar foto' : 'Tomar foto'} onPress={tomarFoto} />
           {foto ? <Image source={{ uri: foto }} style={{ width: '100%', height: 180, borderRadius: 8, borderWidth: 2 }} /> : null}
           <Campo etiqueta="Código de lote de venta (opcional)" valor={lote} onCambio={setLote} />
           <Campo etiqueta="Observaciones" valor={obs} onCambio={setObs} multilinea />

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Modal, ScrollView, Text, useWindowDimensions, View } from 'react-native';
+import { useNav } from './nav';
 import { useApp } from '../state/AppContext';
-import { Aviso, Boton, Fila, Selector, Texto, Titulo, fmt } from '../ui/components';
+import { Aviso, Boton, Fila, Pantalla, Selector, Texto, Titulo, fmt } from '../ui/components';
 import { SeccionView } from '../ui/components/SeccionView';
 import { COLOR_BAJO_CORTE, COLOR_CATEGORIA, RANGOS_LEY, type ModoColor } from '../engine/sectionLayout';
 import type { Bloque } from '../engine/blockModel';
@@ -12,6 +13,7 @@ const NOMBRE_CAT = { probado: 'Probado', probable: 'Probable', posible: 'Posible
 
 export default function BloquesScreen() {
   const app = useApp();
+  const nav = useNav();
   const { width } = useWindowDimensions();
   const [modo, setModo] = useState<ModoColor>('categoria');
   const [zoom, setZoom] = useState(1);
@@ -27,11 +29,11 @@ export default function BloquesScreen() {
     : [...RANGOS_LEY.map((r) => ({ c: r.color, t: r.etiqueta })), { c: COLOR_BAJO_CORTE, t: 'bajo corte' }];
 
   return (
-    <View style={{ flex: 1, padding: 12, backgroundColor: C.fondo }}>
+    <Pantalla scroll={false} pie={<Boton icono="archivo" titulo="Ver resultados" onPress={() => nav.navigate('Resultados')} />}>
       <Selector valor={modo} onCambio={setModo} opciones={[{ k: 'categoria', t: 'Por categoría' }, { k: 'ley', t: 'Por ley diluida' }]} />
       <View style={{ flexDirection: 'row', gap: 8 }}>
-        <Boton chico estilo={{ flex: 1 }} variante="secundario" titulo="－" onPress={() => setZoom((z) => Math.max(1, z / 1.5))} />
-        <Boton chico estilo={{ flex: 1 }} variante="secundario" titulo="＋" onPress={() => setZoom((z) => Math.min(6, z * 1.5))} />
+        <Boton chico estilo={{ flex: 1 }} variante="secundario" soloIcono icono="reducir" titulo="Reducir zoom" onPress={() => setZoom((z) => Math.max(1, z / 1.5))} />
+        <Boton chico estilo={{ flex: 1 }} variante="secundario" soloIcono icono="ampliar" titulo="Ampliar zoom" onPress={() => setZoom((z) => Math.min(6, z * 1.5))} />
       </View>
       <View style={{ flex: 1, borderWidth: 2, marginVertical: 6 }}>
         <SeccionView modelo={e.modelo} nombres={nombres} ancho={(width - 28) * zoom} alto={460 * Math.max(1, zoom * 0.8)}
@@ -70,6 +72,6 @@ export default function BloquesScreen() {
           </SafeAreaView>
         ) : null}
       </Modal>
-    </View>
+    </Pantalla>
   );
 }

@@ -1,11 +1,12 @@
 import React from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { ActivityIndicator, View } from 'react-native';
+import { DefaultTheme, NavigationContainer, type NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { AppProvider, useApp } from './src/state/AppContext';
+import { Icono, type NombreIcono } from './src/ui/Icono';
 import { C, T } from './src/ui/theme';
 import InicioScreen from './src/screens/InicioScreen';
 import MuestrasScreen from './src/screens/MuestrasScreen';
@@ -23,8 +24,11 @@ import LegalScreen from './src/screens/LegalScreen';
 import MasScreen from './src/screens/MasScreen';
 import OperacionesScreen from './src/screens/OperacionesScreen';
 
+type Pestañas = { Inicio: undefined; Muestras: undefined; Sección: undefined; Resumen: undefined; Más: undefined };
+
 export type RootStack = {
-  Tabs: undefined;
+  Tabs: NavigatorScreenParams<Pestañas> | undefined;
+  Modelo: undefined;
   MuestraForm: { id?: string } | undefined;
   Galerias: undefined;
   GaleriaForm: { id?: string } | undefined;
@@ -38,22 +42,28 @@ export type RootStack = {
 };
 
 const Stack = createNativeStackNavigator<RootStack>();
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<Pestañas>();
 
-const icono = (s: string) => ({ color }: { color: string }) => <Text style={{ fontSize: 22, color }}>{s}</Text>;
+const icono = (nombre: NombreIcono) => ({ color }: { color: string }) => <Icono nombre={nombre} color={color} />;
+
+const tema = {
+  ...DefaultTheme,
+  colors: { ...DefaultTheme.colors, background: C.fondo, card: C.superficie, text: C.texto, border: C.borde, primary: C.primario },
+};
 
 function Tabs() {
   return (
     <Tab.Navigator screenOptions={{
-      tabBarStyle: { height: 72, paddingBottom: 10, borderTopWidth: 2, borderTopColor: C.borde },
-      tabBarLabelStyle: { fontSize: 13, fontWeight: '800' }, tabBarActiveTintColor: C.primario, tabBarInactiveTintColor: C.texto,
+      tabBarStyle: { backgroundColor: C.superficie, borderTopColor: C.borde },
+      tabBarHideOnKeyboard: true,
+      tabBarLabelStyle: { fontSize: 11, fontWeight: '700' }, tabBarActiveTintColor: C.primario, tabBarInactiveTintColor: C.textoSuave,
       headerTitleStyle: { fontSize: T.l, fontWeight: '800' },
     }}>
-      <Tab.Screen name="Inicio" component={InicioScreen} options={{ tabBarIcon: icono('⌂') }} />
-      <Tab.Screen name="Muestras" component={MuestrasScreen} options={{ tabBarIcon: icono('＋') }} />
-      <Tab.Screen name="Sección" component={SeccionScreen} options={{ tabBarIcon: icono('▤') }} />
-      <Tab.Screen name="Bloques" component={BloquesScreen} options={{ tabBarIcon: icono('▦') }} />
-      <Tab.Screen name="Más" component={MasScreen} options={{ tabBarIcon: icono('☰') }} />
+      <Tab.Screen name="Inicio" component={InicioScreen} options={{ tabBarIcon: icono('inicio') }} />
+      <Tab.Screen name="Muestras" component={MuestrasScreen} options={{ tabBarIcon: icono('muestras') }} />
+      <Tab.Screen name="Sección" component={SeccionScreen} options={{ tabBarIcon: icono('seccion') }} />
+      <Tab.Screen name="Resumen" component={ResultadosScreen} options={{ title: 'Resultados', tabBarIcon: icono('archivo') }} />
+      <Tab.Screen name="Más" component={MasScreen} options={{ tabBarIcon: icono('mas') }} />
     </Tab.Navigator>
   );
 }
@@ -68,6 +78,7 @@ function Raiz() {
       <Stack.Screen name="Galerias" component={GaleriasScreen} options={{ title: 'Galerías / niveles' }} />
       <Stack.Screen name="GaleriaForm" component={GaleriaFormScreen} options={{ title: 'Galería' }} />
       <Stack.Screen name="Bocamina" component={BocaminaScreen} options={{ title: 'Bocamina' }} />
+      <Stack.Screen name="Modelo" component={BloquesScreen} options={{ title: 'Modelo de bloques' }} />
       <Stack.Screen name="Mapa" component={MapaScreen} options={{ title: 'Mapa' }} />
       <Stack.Screen name="Parametros" component={ParametrosScreen} options={{ title: 'Parámetros' }} />
       <Stack.Screen name="Resultados" component={ResultadosScreen} options={{ title: 'Resultados' }} />
@@ -80,9 +91,9 @@ function Raiz() {
 
 export default function App() {
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <AppProvider>
-        <NavigationContainer>
+        <NavigationContainer theme={tema}>
           <StatusBar style="dark" />
           <Raiz />
         </NavigationContainer>

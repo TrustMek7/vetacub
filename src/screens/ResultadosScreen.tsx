@@ -78,7 +78,7 @@ export default function ResultadosScreen() {
       {e.problemasParametros.map((p) => <Aviso key={p.campo} texto={`Parámetro ${p.campo}: ${p.mensaje}`} />)}
 
       <Titulo>Exportar</Titulo>
-      <Boton titulo="📄 Reporte PDF" deshabilitado={ocupado} onPress={() => ejecutar(() => compartirPdfReporte(app, e))} />
+      <Boton icono="archivo" titulo="Reporte PDF" deshabilitado={ocupado} onPress={() => ejecutar(() => compartirPdfReporte(app, e))} />
       <View style={{ flexDirection: 'row', gap: 8 }}>
         <Boton chico estilo={{ flex: 1 }} variante="secundario" titulo="CSV resumen" deshabilitado={ocupado} onPress={() => ejecutar(() => compartirCsv(app, e, 'resumen'))} />
         <Boton chico estilo={{ flex: 1 }} variante="secundario" titulo="CSV bloques" deshabilitado={ocupado} onPress={() => ejecutar(() => compartirCsv(app, e, 'bloques'))} />

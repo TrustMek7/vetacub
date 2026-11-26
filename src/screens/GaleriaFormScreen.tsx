@@ -59,7 +59,7 @@ export default function GaleriaFormScreen() {
         <Selector etiqueta="Medido desde" valor={ref} onCambio={setRef}
           opciones={[{ k: '__boca', t: 'Bocamina' }, ...otras.map((x) => ({ k: x.id, t: x.nombre }))]} />
       ) : null}
-      <Selector etiqueta="Sentido" valor={sentido} onCambio={setSentido} opciones={[{ k: 'abajo', t: '⬇ Más abajo' }, { k: 'arriba', t: '⬆ Más arriba' }]} />
+      <Selector etiqueta="Sentido" valor={sentido} onCambio={setSentido} opciones={[{ k: 'abajo', t: 'Más abajo' }, { k: 'arriba', t: 'Más arriba' }]} />
       <Campo etiqueta="Desnivel (wincha)" valor={desnivel} onCambio={setDesnivel} numerico sufijo="m" error={err.desnivel} />
       {cotaPrevia != null ? <Texto negrita>Cota calculada: {cotaPrevia.toFixed(1)} msnm</Texto> : null}
       <Campo etiqueta="Fecha" valor={fecha} onCambio={setFecha} placeholder="AAAA-MM-DD" />

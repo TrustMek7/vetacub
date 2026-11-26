@@ -76,7 +76,7 @@ export default function BocaminaScreen() {
   return (
     <Pantalla pie={<Boton titulo="Guardar bocamina" onPress={guardarTodo} />}>
       <Titulo>1. Ubicación (en bocamina, fuera del socavón)</Titulo>
-      <Boton variante="acento" titulo={buscando ? 'Leyendo GPS…' : '📍 Tomar GPS aquí'} onPress={tomarGps} deshabilitado={buscando} />
+      <Boton variante="acento" icono="ubicacion" titulo={buscando ? 'Leyendo GPS…' : 'Tomar GPS aquí'} onPress={tomarGps} deshabilitado={buscando} />
       {err.gps ? <Aviso tipo="peligro" texto={err.gps} /> : null}
       {prec != null ? <Texto negrita>Precisión horizontal: ±{prec.toFixed(0)} m {prec > 15 ? '— espera o muévete a cielo abierto' : ''}</Texto> : null}
       <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -98,7 +98,7 @@ export default function BocaminaScreen() {
       <Titulo>3. Rumbo de la veta</Titulo>
       <Campo etiqueta="Rumbo (azimut, 0–359°)" valor={rumbo} onCambio={setRumbo} numerico sufijo="°" error={err.rumbo}
         ayuda="Dirección en que avanza la galería siguiendo la veta. N45E = 45°, N30W = 330°." />
-      <Boton chico variante="secundario" titulo={rumboVivo == null ? '🧭 Usar brújula del celular' : 'Detener brújula'} onPress={brujula} />
+      <Boton chico variante="secundario" titulo={rumboVivo == null ? 'Usar brújula del celular' : 'Detener brújula'} onPress={brujula} />
       {rumboVivo != null ? (
         <Tarjeta>
           <Text style={{ fontSize: T.xxl, fontWeight: '900', textAlign: 'center' }}>{rumboVivo.toFixed(0)}°</Text>
