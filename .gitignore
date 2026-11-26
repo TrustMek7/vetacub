@@ -1,0 +1,26 @@
+node_modules/
+node_modules.previous-*/
+.expo/
+.expo-home/
+/expo-qr.svg
+/src/map/leafletBundle.generated.ts
+dist/
+build-test/
+android/
+ios/
+
+# Configuración local y credenciales
+.env
+.env.*
+!.env.example
+/.aws/
+/credentials.json
+*.jks
+*.keystore
+*.p12
+*.mobileprovision
+
+# Logs y archivos del sistema
+*.log
+.DS_Store
+Thumbs.db

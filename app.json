@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "VetaCub",
+    "slug": "vetacub",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "pe.turing.vetacub",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "VetaCub usa el GPS para ubicar la bocamina."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "VetaCub usa la cámara para fotografiar las muestras."
+        }
+      ],
+      "expo-sqlite",
+      "expo-sharing",
+      "expo-status-bar"
+    ],
+    "extra": {
+      "syncUrl": "https://TU-BACKEND/api/vetacub/sync",
+      "tileUrl": "https://TU-SERVIDOR-DE-TESELAS/{z}/{x}/{y}.png"
+    }
+  }
+}
