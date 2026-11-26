@@ -55,7 +55,7 @@ El reporte de ejemplo y sus CSV quedan en `demo/`.
 | Caso | Verifica |
 |---|---|
 | Veta angosta con dilución | 10 g/t, 0.4 m → 5 g/t diluida; 8.64 t y 43.2 g por bloque de 2×2 m |
-| Veta ancha sin dilución | 6 g/t, 1.2 m → sin dilución; 12.96 t (ancho real) o 8.64 t (fórmula literal) |
+| Veta ancha sin dilución | 6 g/t, 1.2 m → sin dilución; 8.64 t con el ancho mínimo de minado |
 | Bloque entre dos galerías | A > 5 m de toda muestra pero entre galerías a 15 m → Probado; a 20 m → Probable |
 | Más allá de la última muestra | Proyección hasta 10 m; categorías por distancia; pesos IDW suman 1 y domina la última muestra |
 | Bajo ley de corte | 1.0 g/t excluido; 2.5 g/t en 0.4 m cae bajo el corte por dilución |

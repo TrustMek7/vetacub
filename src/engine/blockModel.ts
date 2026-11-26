@@ -137,7 +137,7 @@ export function construirModelo(e: EntradaModelo): ModeloBloques {
 
       const leyCorregida = est.ley * factor;
       const leyDiluida = diluir(leyCorregida, est.ancho, p.anchoMinimoMinado);
-      const anchoMinado = p.anchoVolumen === 'max' ? Math.max(est.ancho, p.anchoMinimoMinado) : p.anchoMinimoMinado;
+      const anchoMinado = p.anchoMinimoMinado;
       const largo = x1 - x0, alto = y1 - y0;
       const volumenM3 = largo * alto * anchoMinado;
       const toneladas = volumenM3 * p.densidad;

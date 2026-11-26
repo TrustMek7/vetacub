@@ -1,6 +1,6 @@
 // Captura rápida (< 1 minuto): galería y origen se recuerdan, el avance se sugiere y el código se autogenera.
 import React, { useMemo, useRef, useState } from 'react';
-import { Alert, Image, TextInput, View } from 'react-native';
+import { Alert, Image, type TextInput, View } from 'react-native';
 import { useRoute, type RouteProp } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system/legacy';
@@ -45,8 +45,8 @@ export default function MuestraFormScreen() {
   const [fecha] = useState(m?.fecha ?? new Date().toISOString());
   const [mas, setMas] = useState(!!m);
   const [errores, setErrores] = useState<Record<string, string | undefined>>({});
-  const refAncho = useRef<TextInput>(null);
-  const refLey = useRef<TextInput>(null);
+  const refAncho = useRef<React.ComponentRef<typeof TextInput>>(null);
+  const refLey = useRef<React.ComponentRef<typeof TextInput>>(null);
 
   const cambiarGaleria = (gid: string) => {
     setGaleriaId(gid);

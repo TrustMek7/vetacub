@@ -31,7 +31,7 @@ export function Boton({ titulo, onPress, variante = 'primario', deshabilitado, e
 
 export function Campo({ etiqueta, valor, onCambio, numerico, error, ayuda, placeholder, multilinea, autoFocus, sufijo, refInput, onSubmit }: {
   etiqueta: string; valor: string; onCambio: (t: string) => void; numerico?: boolean; error?: string; ayuda?: string;
-  placeholder?: string; multilinea?: boolean; autoFocus?: boolean; sufijo?: string; refInput?: React.Ref<TextInput>; onSubmit?: () => void;
+  placeholder?: string; multilinea?: boolean; autoFocus?: boolean; sufijo?: string; refInput?: React.Ref<React.ComponentRef<typeof TextInput>>; onSubmit?: () => void;
 }) {
   return (
     <View style={{ marginBottom: ESPACIO }}>

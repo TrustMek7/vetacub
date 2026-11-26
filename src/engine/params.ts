@@ -3,7 +3,6 @@ import type { Parametros } from '../domain/types';
 export const PARAMETROS_POR_DEFECTO: Parametros = {
   densidad: 2.7,
   anchoMinimoMinado: 0.8,
-  anchoVolumen: 'max',
   alcanceMasAllaUltimaMuestra: 10,
   celdaLargo: 2,
   celdaAlto: 2,

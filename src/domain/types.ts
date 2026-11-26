@@ -76,7 +76,6 @@ export interface Parametros {
   densidad: number;                       // t/m³
   anchoMinimoMinado: number;              // m
   /** 'max': volumen con max(ancho veta, ancho mínimo). 'minimo': siempre ancho mínimo (fórmula literal del requerimiento). */
-  anchoVolumen: 'max' | 'minimo';
   alcanceMasAllaUltimaMuestra: number;    // m en horizontal
   celdaLargo: number;                     // m
   celdaAlto: number;                      // m

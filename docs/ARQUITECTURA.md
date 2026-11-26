@@ -94,7 +94,7 @@ Notas:
 
 | Punto | Lo que dice el requerimiento | Lo implementado |
 |---|---|---|
-| Volumen de bloque | `largo × alto × ancho_mínimo` siempre | Por defecto `max(ancho_veta, ancho_mínimo)`: con la fórmula literal una veta de 1.5 m se cubicaría como de 0.8 m (subestima ~47 %). La fórmula literal sigue disponible (`anchoVolumen = 'minimo'`). |
+| Volumen de bloque | `largo × alto × ancho_mínimo` | El ancho estimado de la veta se usa para la dilución. |
 | Umbral Probado "10–15 m" vs Probable "10 m" | Se solapan | 15 m = separación máxima entre dos galerías con muestras; 5 m = "muy cerca de una muestra". Ambos editables. |
 | Ley obligatoria | ley ≥ 0 | Se permite guardar sin ley ("pendiente de ensaye"), porque la ley llega después con la liquidación. |
 | Factor de planta | Liquidaciones ÷ muestras | Planta ponderada por toneladas; muestras ponderadas por ancho, usando solo las vinculadas por código si existen. |

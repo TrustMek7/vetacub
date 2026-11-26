@@ -71,7 +71,7 @@ ${seccionSvg(est.modelo, nombres, { mostrarBloques: true, modo: 'categoria', anc
 
 <h2>Parámetros usados</h2>
 <div class="grid2 small">
-<div>Densidad: ${f(p.densidad)} t/m³</div><div>Ancho mínimo de minado: ${f(p.anchoMinimoMinado)} m (${p.anchoVolumen === 'max' ? 'volumen con el mayor entre ancho de veta y mínimo' : 'volumen siempre con ancho mínimo'})</div>
+<div>Densidad: ${f(p.densidad)} t/m³</div><div>Ancho mínimo de minado: ${f(p.anchoMinimoMinado)} m</div>
 <div>Celda: ${f(p.celdaLargo, 1)} × ${f(p.celdaAlto, 1)} m</div><div>Ley de corte: ${f(p.leyCorte)} g/t · Recuperación: ${f(p.recuperacionPlanta * 100, 0)} %</div>
 <div>IDW potencia ${f(p.potenciaIdw, 1)} · dist. máx ${f(p.distanciaMaxInfluencia, 0)} m · máx ${p.maxMuestrasIdw} muestras${p.leyTope != null ? ` · tope ${f(p.leyTope)} g/t` : ''}</div>
 <div>Alcance tras última muestra: ${f(p.alcanceMasAllaUltimaMuestra, 0)} m</div>

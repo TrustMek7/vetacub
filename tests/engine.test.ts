@@ -36,12 +36,13 @@ describe('Caso 2 — veta ancha sin dilución', () => {
     const m = construirModelo({ bocamina: bocamina(), galerias: [g], muestras: ms, params: params() });
     for (const b of m.bloques) cerca(b.leyDiluida, 6);
   });
-  test("volumen con ancho real (modo 'max'): 2 × 2 × 1.2 × 2.7 = 12.96 t", () => {
+  test('el volumen usa el ancho mínimo incluso en una veta ancha', () => {
     const m = construirModelo({ bocamina: bocamina(), galerias: [g], muestras: ms, params: params() });
-    cerca(bloqueEn(m, 5, 3001).toneladas, 12.96);
+    cerca(bloqueEn(m, 5, 3001).toneladas, 8.64);
   });
-  test("fórmula literal (modo 'minimo'): 2 × 2 × 0.8 × 2.7 = 8.64 t", () => {
-    const m = construirModelo({ bocamina: bocamina(), galerias: [g], muestras: ms, params: params({ anchoVolumen: 'minimo' }) });
+  test('el ajuste de ancho guardado por versiones anteriores no cambia el cálculo', () => {
+    const valoresGuardados = { ...params(), anchoVolumen: 'max' };
+    const m = construirModelo({ bocamina: bocamina(), galerias: [g], muestras: ms, params: valoresGuardados });
     cerca(bloqueEn(m, 5, 3001).toneladas, 8.64);
   });
   test('diluir() en el límite exacto no diluye', () => cerca(diluir(7, 0.8, 0.8), 7));

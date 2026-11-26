@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../state/AppContext';
-import { Aviso, Boton, Campo, Pantalla, Selector, Titulo, num } from '../ui/components';
+import { Aviso, Boton, Campo, Pantalla, Titulo, num } from '../ui/components';
 import { guardarParametros } from '../db/repos';
 import { PARAMETROS_POR_DEFECTO, validarParametros } from '../engine/params';
 import type { Parametros } from '../domain/types';
@@ -42,11 +42,10 @@ export default function ParametrosScreen() {
   const aTexto = (p: Parametros) => Object.fromEntries(CAMPOS.flatMap((g) => g.campos).map((c) => [c.k, String(c.pct ? Math.round(p[c.k] * 1000) / 10 : p[c.k])]));
   const [txt, setTxt] = useState<Record<string, string>>(aTexto(app.params));
   const [tope, setTope] = useState(app.params.leyTope == null ? '' : String(app.params.leyTope));
-  const [anchoVol, setAnchoVol] = useState(app.params.anchoVolumen);
   const [moneda, setMoneda] = useState(app.params.moneda);
 
   const construir = (): Parametros | null => {
-    const p: Parametros = { ...app.params, anchoVolumen: anchoVol, moneda, leyTope: num(tope) };
+    const p: Parametros = { ...app.params, moneda, leyTope: num(tope) };
     for (const c of CAMPOS.flatMap((g) => g.campos)) {
       const v = num(txt[c.k] ?? '');
       if (v == null) return null;
@@ -68,10 +67,6 @@ export default function ParametrosScreen() {
             <Campo key={c.k} etiqueta={c.e} valor={txt[c.k] ?? ''} onCambio={(v) => setTxt((t) => ({ ...t, [c.k]: v }))} numerico sufijo={c.u}
               ayuda={c.ayuda} error={errores[c.k] ?? (num(txt[c.k] ?? '') == null ? 'Requerido' : undefined)} />
           ))}
-          {g.titulo === 'Material' ? (
-            <Selector etiqueta="Volumen del bloque con…" valor={anchoVol} onCambio={setAnchoVol} opciones={[
-              { k: 'max', t: 'Mayor entre veta y mínimo' }, { k: 'minimo', t: 'Siempre ancho mínimo' }]} />
-          ) : null}
           {g.titulo === 'Bloques e interpolación' ? (
             <Campo etiqueta="Ley tope (vacío = sin tope)" valor={tope} onCambio={setTope} numerico sufijo="g/t" ayuda="Recorta leyes erráticas muy altas antes de interpolar" />
           ) : null}
@@ -83,7 +78,7 @@ export default function ParametrosScreen() {
       <Aviso tipo="info" texto={`Zona UTM: ${app.params.zonaUtm}. Se edita en la pantalla Bocamina.`} />
       <Boton variante="secundario" titulo="Restaurar valores por defecto" onPress={() => {
         setTxt(aTexto({ ...PARAMETROS_POR_DEFECTO, precioOroPorOnza: app.params.precioOroPorOnza, costoPorTonelada: app.params.costoPorTonelada, costoSiguienteAvance: app.params.costoSiguienteAvance }));
-        setTope(''); setAnchoVol('max');
+        setTope('');
       }} />
     </Pantalla>
   );
