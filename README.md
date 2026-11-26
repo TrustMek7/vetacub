@@ -20,6 +20,19 @@ Conecta la PC y el teléfono a la misma red Wi-Fi y escanea desde Expo Go el QR 
 
 `npm ci` instala las versiones del archivo de bloqueo y ejecuta el script que incluye Leaflet en el paquete de la app. Para una compilación nativa local, usa `npm run android` con Android Studio y el SDK de Android configurados. El script `npm run build:apk` requiere un proyecto EAS configurado con un perfil `preview` para APK.
 
+### APK de demostración en Windows
+
+Configura `JAVA_HOME` con un JDK compatible y `ANDROID_HOME` con el SDK de Android. El build usa la plataforma Android 37, Build-Tools 37.0.0, NDK 27.1.12297006 y CMake 3.22.1.
+
+```powershell
+npm ci
+.\scripts\build-demo-android.ps1 -Keystore 'C:\ruta\vetacub-demo.jks' -Alias 'vetacub-demo'
+```
+
+El script genera el APK en `dist/`, solicita la contraseña de la clave local y verifica la firma. Conserva la clave fuera del repositorio. Para distribuir una actualización, usa la misma clave y aumenta `expo.android.versionCode` en `app.json`.
+
+Antes de compartir el archivo, sigue el [recorrido de validación del demo](docs/PRUEBAS-DEMO.md) con el APK instalado.
+
 ## Sincronización y mapa offline
 
 En `app.json`, dentro de `expo.extra`, configura estos valores para tu entorno.
